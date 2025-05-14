@@ -1,0 +1,377 @@
+<!-- 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colorful Dice Game for Four Players</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      max-width: 700px;
+      padding: 20px;
+      background-color: #f3f3f3;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 1s ease-in-out;
+    }
+    h1 {
+      color: #333;
+    }
+    .player-container {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+    }
+    .player {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 18px;
+      color: #333;
+    }
+    .dice {
+      width: 60px;
+      height: 60px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin-top: 10px;
+      animation: roll 0.5s ease-in-out;
+    }
+    .dice.one { background-color: #FFDDC1; }
+    .dice.two { background-color: #FFABAB; }
+    .dice.three { background-color: #FFC3A0; }
+    .dice.four { background-color: #FF677D; }
+    .dice.five { background-color: #D4A5A5; }
+    .dice.six { background-color: #392F5A; color: white; }
+    
+    .dot {
+      width: 12px;
+      height: 12px;
+      background-color: #333;
+      border-radius: 50%;
+      opacity: 0;
+    }
+    .dice.six .dot {
+      background-color: white;
+    }
+    .dice.one .dot:nth-child(5),
+    .dice.two .dot:nth-child(1),
+    .dice.two .dot:nth-child(9),
+    .dice.three .dot:nth-child(1),
+    .dice.three .dot:nth-child(5),
+    .dice.three .dot:nth-child(9),
+    .dice.four .dot:nth-child(1),
+    .dice.four .dot:nth-child(3),
+    .dice.four .dot:nth-child(7),
+    .dice.four .dot:nth-child(9),
+    .dice.five .dot:nth-child(1),
+    .dice.five .dot:nth-child(3),
+    .dice.five .dot:nth-child(5),
+    .dice.five .dot:nth-child(7),
+    .dice.five .dot:nth-child(9),
+    .dice.six .dot:nth-child(1),
+    .dice.six .dot:nth-child(3),
+    .dice.six .dot:nth-child(4),
+    .dice.six .dot:nth-child(6),
+    .dice.six .dot:nth-child(7),
+    .dice.six .dot:nth-child(9) {
+      opacity: 1;
+    }
+    #roll-btn, #reset-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      animation: fadeIn 1s ease-in-out;
+    }
+    #roll-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    #reset-btn {
+      background-color: #f44336;
+      color: white;
+    }
+    #winner {
+      font-size: 24px;
+      color: #4CAF50;
+      font-weight: bold;
+      margin-top: 20px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes roll {
+      0% { transform: rotate(0); }
+      50% { transform: rotate(360deg); }
+      100% { transform: rotate(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Colorful Dice Game for Four Players</h1>
+    <div class="player-container">
+      <div id="player1" class="player">Player 1<div class="dice" id="dice1"></div></div>
+      <div id="player2" class="player">Player 2<div class="dice" id="dice2"></div></div>
+      <div id="player3" class="player">Player 3<div class="dice" id="dice3"></div></div>
+      <div id="player4" class="player">Player 4<div class="dice" id="dice4"></div></div>
+    </div>
+    
+    <button id="roll-btn" onclick="rollDice()">Roll Dice</button>
+    <button id="reset-btn" onclick="resetGame()">Reset</button>
+    
+    <div id="winner"></div>
+  </div>
+
+  <script>
+    function createDiceFace(diceElement, roll) {
+      diceElement.className = `dice ${["", "one", "two", "three", "four", "five", "six"][roll]}`;
+      diceElement.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        diceElement.appendChild(dot);
+      }
+    }
+
+    function rollDice() {
+      const rolls = [];
+      for (let i = 1; i <= 4; i++) {
+        const roll = Math.floor(Math.random() * 6) + 1;
+        const diceElement = document.getElementById(`dice${i}`);
+        createDiceFace(diceElement, roll);
+        rolls.push(roll);
+      }
+
+      const maxRoll = Math.max(...rolls);
+      const winners = rolls
+        .map((roll, index) => roll === maxRoll ? `Player ${index + 1}` : null)
+        .filter(player => player !== null);
+
+      const winnerText = winners.length === 1 
+        ? `${winners[0]} wins with a roll of ${maxRoll}! 🎉` 
+        : `It's a tie between ${winners.join(' and ')} with a roll of ${maxRoll}! 🎉`;
+      
+      document.getElementById("winner").innerText = winnerText;
+    }
+
+    function resetGame() {
+      for (let i = 1; i <= 4; i++) {
+        const diceElement = document.getElementById(`dice${i}`);
+        diceElement.innerHTML = '';
+        diceElement.className = 'dice';
+      }
+      document.getElementById("winner").innerText = "";
+    }
+  </script>
+</body>
+</html>
+ -->
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stable Color Dice Game for Four Players</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      max-width: 700px;
+      padding: 20px;
+      background-color: #f3f3f3;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 1s ease-in-out;
+    }
+    h1 {
+      color: #333;
+    }
+    .player-container {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+    }
+    .player {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 18px;
+      color: #333;
+    }
+    .dice {
+      width: 60px;
+      height: 60px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin-top: 10px;
+      animation: roll 0.5s ease-in-out;
+    }
+    /* Assign stable colors for each player's dice */
+    #dice1 { background-color: #FFDDC1; }
+    #dice2 { background-color: #FFABAB; }
+    #dice3 { background-color: #FFC3A0; }
+    #dice4 { background-color: #FF677D; }
+    
+    .dot {
+      width: 12px;
+      height: 12px;
+      background-color: #333;
+      border-radius: 50%;
+      opacity: 0;
+    }
+
+    .dice.one .dot:nth-child(5),
+    .dice.two .dot:nth-child(1),
+    .dice.two .dot:nth-child(9),
+    .dice.three .dot:nth-child(1),
+    .dice.three .dot:nth-child(5),
+    .dice.three .dot:nth-child(9),
+    .dice.four .dot:nth-child(1),
+    .dice.four .dot:nth-child(3),
+    .dice.four .dot:nth-child(7),
+    .dice.four .dot:nth-child(9),
+    .dice.five .dot:nth-child(1),
+    .dice.five .dot:nth-child(3),
+    .dice.five .dot:nth-child(5),
+    .dice.five .dot:nth-child(7),
+    .dice.five .dot:nth-child(9),
+    .dice.six .dot:nth-child(1),
+    .dice.six .dot:nth-child(3),
+    .dice.six .dot:nth-child(4),
+    .dice.six .dot:nth-child(6),
+    .dice.six .dot:nth-child(7),
+    .dice.six .dot:nth-child(9) {
+      opacity: 1;
+    }
+    #roll-btn, #reset-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      animation: fadeIn 1s ease-in-out;
+    }
+    #roll-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    #reset-btn {
+      background-color: #f44336;
+      color: white;
+    }
+    #winner {
+      font-size: 24px;
+      color: #4CAF50;
+      font-weight: bold;
+      margin-top: 20px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes roll {
+      0% { transform: rotate(0); }
+      50% { transform: rotate(360deg); }
+      100% { transform: rotate(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Stable Color Dice Game for Four Players</h1>
+    <div class="player-container">
+      <div id="player1" class="player">Player 1<div class="dice" id="dice1"></div></div>
+      <div id="player2" class="player">Player 2<div class="dice" id="dice2"></div></div>
+      <div id="player3" class="player">Player 3<div class="dice" id="dice3"></div></div>
+      <div id="player4" class="player">Player 4<div class="dice" id="dice4"></div></div>
+    </div>
+    
+    <button id="roll-btn" onclick="rollDice()">Roll Dice</button>
+    <button id="reset-btn" onclick="resetGame()">Reset</button>
+    
+    <div id="winner"></div>
+  </div>
+
+  <script>
+    function createDiceFace(diceElement, roll) {
+      diceElement.className = `dice ${["", "one", "two", "three", "four", "five", "six"][roll]}`;
+      diceElement.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        diceElement.appendChild(dot);
+      }
+    }
+
+    function rollDice() {
+      const rolls = [];
+      for (let i = 1; i <= 4; i++) {
+        const roll = Math.floor(Math.random() * 6) + 1;
+        const diceElement = document.getElementById(`dice${i}`);
+        createDiceFace(diceElement, roll);
+        rolls.push(roll);
+      }
+
+      const maxRoll = Math.max(...rolls);
+      const winners = rolls
+        .map((roll, index) => roll === maxRoll ? `Player ${index + 1}` : null)
+        .filter(player => player !== null);
+
+      const winnerText = winners.length === 1 
+        ? `${winners[0]} wins with a roll of ${maxRoll}! 🎉` 
+        : `It's a tie between ${winners.join(' and ')} with a roll of ${maxRoll}! 🎉`;
+      
+      document.getElementById("winner").innerText = winnerText;
+    }
+
+    function resetGame() {
+      for (let i = 1; i <= 4; i++) {
+        const diceElement = document.getElementById(`dice${i}`);
+        diceElement.innerHTML = '';
+        diceElement.className = 'dice';
+      }
+      document.getElementById("winner").innerText = "";
+    }
+  </script>
+</body>
+</html>
